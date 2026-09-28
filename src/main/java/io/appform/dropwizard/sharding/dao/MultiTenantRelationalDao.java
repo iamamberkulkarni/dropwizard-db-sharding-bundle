@@ -447,14 +447,14 @@ public class MultiTenantRelationalDao<T> implements ShardedDao<T> {
     }
 
     public <U> void save(LockedContext<U> context, T entity) {
-        save((LockedTransactionContext) context, entity);
+        saveInternal(context, entity);
     }
 
     public <U> void save(BulkLockedContext<U> context, T entity) {
-        save((LockedTransactionContext) context, entity);
+        saveInternal(context, entity);
     }
 
-    private void save(LockedTransactionContext context, T entity) {
+    private void saveInternal(LockedTransactionContext context, T entity) {
         val tenantId = context.getTenantId();
         RelationalDaoPriv dao = daos.get(tenantId).get(context.getShardId());
         val opContext = Save.<T, T>builder().entity(entity).saver(dao::save).build();
@@ -515,7 +515,7 @@ public class MultiTenantRelationalDao<T> implements ShardedDao<T> {
             DetachedCriteria criteria,
             UnaryOperator<T> updater,
             BooleanSupplier updateNext) {
-        return update((LockedTransactionContext) context, criteria, updater, updateNext);
+        return updateInternal(context, criteria, updater, updateNext);
     }
 
     <U> boolean update(
@@ -523,10 +523,10 @@ public class MultiTenantRelationalDao<T> implements ShardedDao<T> {
             DetachedCriteria criteria,
             UnaryOperator<T> updater,
             BooleanSupplier updateNext) {
-        return update((LockedTransactionContext) context, criteria, updater, updateNext);
+        return updateInternal(context, criteria, updater, updateNext);
     }
 
-    private boolean update(
+    private boolean updateInternal(
             LockedTransactionContext context,
             DetachedCriteria criteria,
             UnaryOperator<T> updater,
